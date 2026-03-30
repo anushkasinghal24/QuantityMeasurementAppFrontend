@@ -186,6 +186,3 @@ If you integrate an API later, here is a suggested contract:
    - Screenshots (UI changes)
    - Testing notes (manual steps)
 
-## License
-
-MIT License — see `LICENSE` for details.
