@@ -1,0 +1,46 @@
+<header class="nav">
+  <div class="nav-inner container">
+    <a class="brand" routerLink="/app/dashboard" (click)="closeMenu()">
+      <span class="brand-mark">QMA</span>
+      <span class="brand-text">Quantity Measurement</span>
+    </a>
+
+    <button class="icon-btn mobile-only" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+      <span class="icon-lines" [class.open]="isMenuOpen()"></span>
+    </button>
+
+    <nav class="links desktop-only">
+      <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+      <a routerLink="/app/converter" routerLinkActive="active">Converter</a>
+      <a routerLink="/app/history" routerLinkActive="active">History</a>
+      <a routerLink="/app/profile" routerLinkActive="active">Profile</a>
+    </nav>
+
+    <div class="actions desktop-only">
+      @if (userEmail()) {
+        <span class="user-pill" [title]="userEmail()!">{{ userEmail() }}</span>
+      }
+      <button class="btn btn-secondary" type="button" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  @if (isMenuOpen()) {
+    <div class="mobile-menu mobile-only">
+      <div class="container mobile-menu-inner">
+        <a routerLink="/app/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()"
+          >Dashboard</a
+        >
+        <a routerLink="/app/converter" routerLinkActive="active" (click)="closeMenu()">Converter</a>
+        <a routerLink="/app/history" routerLinkActive="active" (click)="closeMenu()">History</a>
+        <a routerLink="/app/profile" routerLinkActive="active" (click)="closeMenu()">Profile</a>
+
+        <div class="mobile-actions">
+          @if (userEmail()) {
+            <div class="user-pill" [title]="userEmail()!">{{ userEmail() }}</div>
+          }
+          <button class="btn btn-secondary w-full" type="button" (click)="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  }
+</header>

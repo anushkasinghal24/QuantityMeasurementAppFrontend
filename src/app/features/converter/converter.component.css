@@ -1,0 +1,82 @@
+.panel {
+  padding: 18px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.panel-text {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.form {
+  margin-top: 12px;
+  display: grid;
+  gap: 14px;
+}
+
+.result {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.result-value {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.unit {
+  margin-left: 6px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.result-value.ok {
+  color: var(--success);
+}
+
+.result-value.bad {
+  color: var(--danger);
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.tab {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.tab:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--text);
+}
+
+.tab.active {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.22);
+  color: var(--primary);
+}
+

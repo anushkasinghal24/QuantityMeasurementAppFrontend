@@ -1,0 +1,389 @@
+<!-- <section class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Converter</h1>
+      <p class="page-subtitle">Real-time conversions, comparisons, and unit arithmetic.</p>
+    </div>
+  </header>
+
+  <div class="tabs card">
+    <button class="tab" type="button" [class.active]="activeTab() === 'convert'" (click)="activeTab.set('convert')">
+      Convert
+    </button>
+    <button class="tab" type="button" [class.active]="activeTab() === 'compare'" (click)="activeTab.set('compare')">
+      Compare
+    </button>
+    <button class="tab" type="button" [class.active]="activeTab() === 'calc'" (click)="activeTab.set('calc')">
+      Calculate
+    </button>
+  </div>
+
+  @if (activeTab() === 'convert') {
+    <div class="grid grid-2">
+      <div class="card panel">
+        <h2 class="panel-title">Conversion</h2>
+
+        <form class="form" [formGroup]="form">
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="label" for="category">Category</label>
+              <select id="category" class="input" formControlName="category" (change)="onCategoryChange()">
+                @for (c of categories; track c.id) {
+                  <option [value]="c.id">{{ c.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="value">Value</label>
+              <input id="value" class="input" type="number" formControlName="value" step="any" />
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="label" for="fromUnitId">From</label>
+              <select id="fromUnitId" class="input" formControlName="fromUnitId">
+                @for (u of units(); track u.id) {
+                  <option [value]="u.id">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="toUnitId">To</label>
+              <select id="toUnitId" class="input" formControlName="toUnitId">
+                @for (u of units(); track u.id) {
+                  <option [value]="u.id">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card panel result">
+        <h2 class="panel-title">Result</h2>
+        <p class="result-value">
+          @if (result().ok) {
+            {{ result().value }}
+          } @else {
+            —
+          }
+        </p>
+        @if (!result().ok) {
+          <div class="alert alert-danger">{{ result().message }}</div>
+        } @else {
+          <p class="panel-text">Tip: switch units to compare measurements instantly.</p>
+        }
+        <button class="btn btn-secondary" type="button" [disabled]="!result().ok" (click)="saveConversion()">
+          Save to history
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'compare') {
+    <div class="grid grid-2">
+      <div class="card panel">
+        <h2 class="panel-title">Comparison</h2>
+        <p class="panel-text">Example: <strong>1km &gt; 500m</strong></p>
+
+        <form class="form" [formGroup]="compareForm">
+          <div class="field">
+            <label class="label" for="compareExpr">Expression</label>
+            <input id="compareExpr" class="input" type="text" formControlName="expression" />
+          </div>
+        </form>
+      </div>
+
+      <div class="card panel result">
+        <h2 class="panel-title">Result</h2>
+        @if (compareResult() === null) {
+          <p class="result-value">—</p>
+        } @else if (compareResult()!.ok) {
+          <p class="result-value" [class.ok]="compareResult()!.result" [class.bad]="!compareResult()!.result">
+            {{ compareResult()!.result ? 'TRUE' : 'FALSE' }}
+          </p>
+          <p class="panel-text">Save comparisons to revisit later.</p>
+        } @else {
+          <p class="result-value">—</p>
+          <div class="alert alert-danger">{{ compareResult()!.message }}</div>
+        }
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          [disabled]="!(compareResult() && compareResult()!.ok)"
+          (click)="saveComparison()"
+        >
+          Save to history
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'calc') {
+    <div class="grid grid-2">
+      <div class="card panel">
+        <h2 class="panel-title">Arithmetic</h2>
+        <p class="panel-text">Examples: <strong>5m + 10cm</strong>, <strong>5m * 2</strong>, <strong>10kg / 2</strong></p>
+
+        <form class="form" [formGroup]="calcForm">
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="label" for="calcCategory">Category</label>
+              <select id="calcCategory" class="input" formControlName="category" (change)="onCalcCategoryChange()">
+                @for (c of categories; track c.id) {
+                  <option [value]="c.id">{{ c.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="outputUnitId">Output unit</label>
+              <select id="outputUnitId" class="input" formControlName="outputUnitId">
+                @for (u of calcUnits(); track u.id) {
+                  <option [value]="u.id">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="calcExpr">Expression</label>
+            <input id="calcExpr" class="input" type="text" formControlName="expression" />
+          </div>
+        </form>
+      </div>
+
+      <div class="card panel result">
+        <h2 class="panel-title">Result</h2>
+        @if (calcResult() === null) {
+          <p class="result-value">—</p>
+        } @else if (calcResult()!.ok) {
+          <p class="result-value">
+            {{ calcResult()!.value }}@if (calcResult()!.unitId) { <span class="unit">{{ calcResult()!.unitId }}</span> }
+          </p>
+          <p class="panel-text">Tip: add/subtract requires compatible units.</p>
+        } @else {
+          <p class="result-value">—</p>
+          <div class="alert alert-danger">{{ calcResult()!.message }}</div>
+        }
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          [disabled]="!(calcResult() && calcResult()!.ok)"
+          (click)="saveCalculation()"
+        >
+          Save to history
+        </button>
+      </div>
+    </div>
+  }
+</section>
+ -->
+
+ <section class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Converter</h1>
+      <p class="page-subtitle">Real-time conversions, comparisons, and unit arithmetic.</p>
+    </div>
+  </header>
+
+  <div class="tabs card">
+    <button class="tab" type="button" [class.active]="activeTab() === 'convert'" (click)="activeTab.set('convert')">
+      Convert
+    </button>
+    <button class="tab" type="button" [class.active]="activeTab() === 'compare'" (click)="activeTab.set('compare')">
+      Compare
+    </button>
+    <button class="tab" type="button" [class.active]="activeTab() === 'calc'" (click)="activeTab.set('calc')">
+      Calculate
+    </button>
+  </div>
+
+  <!-- ================= CONVERT ================= -->
+  @if (activeTab() === 'convert') {
+    @let res = result();
+
+    <div class="grid grid-2">
+      <div class="card panel">
+        <h2 class="panel-title">Conversion</h2>
+
+        <form class="form" [formGroup]="form">
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="label">Category</label>
+              <select class="input" formControlName="category" (change)="onCategoryChange()">
+                @for (c of categories; track c.id) {
+                  <option [value]="c.id">{{ c.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label">Value</label>
+              <input class="input" type="number" formControlName="value" step="any" />
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="label">From</label>
+              <select class="input" formControlName="fromUnitId">
+                @for (u of units(); track u.id) {
+                  <option [value]="u.id">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label">To</label>
+              <select class="input" formControlName="toUnitId">
+                @for (u of units(); track u.id) {
+                  <option [value]="u.id">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card panel result">
+        <h2 class="panel-title">Result</h2>
+
+        <p class="result-value">
+          @if (res?.ok) {
+            {{ $any(res).value }}
+          } @else {
+            —
+          }
+        </p>
+
+        @if (!res?.ok) {
+          <div class="alert alert-danger">{{ $any(res).message }}</div>
+        } @else {
+          <p class="panel-text">Tip: switch units to compare measurements instantly.</p>
+        }
+
+        <button class="btn btn-secondary" type="button" [disabled]="!res?.ok" (click)="saveConversion()">
+          Save to history
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ================= COMPARE ================= -->
+  @if (activeTab() === 'compare') {
+    @let comp = compareResult();
+
+    <div class="grid grid-2">
+      <div class="card panel">
+        <h2 class="panel-title">Comparison</h2>
+        <p class="panel-text">Example: <strong>1km &gt; 500m</strong></p>
+
+        <form class="form" [formGroup]="compareForm">
+          <div class="field">
+            <label class="label">Expression</label>
+            <input class="input" type="text" formControlName="expression" />
+          </div>
+        </form>
+      </div>
+
+      <div class="card panel result">
+        <h2 class="panel-title">Result</h2>
+
+        @if (comp === null) {
+          <p class="result-value">—</p>
+        } @else if (comp.ok) {
+          <p class="result-value" [class.ok]="$any(comp).result" [class.bad]="!$any(comp).result">
+            {{ $any(comp).result ? 'TRUE' : 'FALSE' }}
+          </p>
+          <p class="panel-text">Save comparisons to revisit later.</p>
+        } @else {
+          <p class="result-value">—</p>
+          <div class="alert alert-danger">{{ $any(comp).message }}</div>
+        }
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          [disabled]="!(comp && comp.ok)"
+          (click)="saveComparison()"
+        >
+          Save to history
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ================= CALCULATE ================= -->
+  @if (activeTab() === 'calc') {
+    @let calc = calcResult();
+
+    <div class="grid grid-2">
+      <div class="card panel">
+        <h2 class="panel-title">Arithmetic</h2>
+        <p class="panel-text">Examples: <strong>5m + 10cm</strong>, <strong>5m * 2</strong></p>
+
+        <form class="form" [formGroup]="calcForm">
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="label">Category</label>
+              <select class="input" formControlName="category" (change)="onCalcCategoryChange()">
+                @for (c of categories; track c.id) {
+                  <option [value]="c.id">{{ c.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label">Output unit</label>
+              <select class="input" formControlName="outputUnitId">
+                @for (u of calcUnits(); track u.id) {
+                  <option [value]="u.id">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Expression</label>
+            <input class="input" type="text" formControlName="expression" />
+          </div>
+        </form>
+      </div>
+
+      <div class="card panel result">
+        <h2 class="panel-title">Result</h2>
+
+        @if (calc === null) {
+          <p class="result-value">—</p>
+        } @else if (calc.ok) {
+          <p class="result-value">
+            {{ $any(calc).value }}
+            @if ($any(calc).unitId) {
+              <span class="unit">{{ $any(calc).unitId }}</span>
+            }
+          </p>
+          <p class="panel-text">Tip: add/subtract requires compatible units.</p>
+        } @else {
+          <p class="result-value">—</p>
+          <div class="alert alert-danger">{{ $any(calc).message }}</div>
+        }
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          [disabled]="!(calc && calc.ok)"
+          (click)="saveCalculation()"
+        >
+          Save to history
+        </button>
+      </div>
+    </div>
+  }
+</section>
