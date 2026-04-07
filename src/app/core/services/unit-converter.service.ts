@@ -240,7 +240,10 @@ export class UnitConverterService {
           if (baseRight === 0) return { ok: false, message: 'Division by zero.' };
           return { ok: true, value: round(baseLeft / baseRight), unitId: null, category: null };
         }
-        return { ok: false, message: 'Multiply/divide supports unit × scalar (or unit ÷ unit for ratios).' };
+        return {
+          ok: false,
+          message: 'Multiply supports unit × scalar. Divide supports unit ÷ scalar (or unit ÷ unit for ratios).',
+        };
       }
 
       if (!leftIsMeasurement && !rightIsMeasurement) {

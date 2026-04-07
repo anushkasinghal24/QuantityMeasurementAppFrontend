@@ -1,6 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { HistoryService } from '../../core/services/history.service';
+import { Notification } from '../../core/services/notification';
 
 @Component({
   selector: 'app-profile',
@@ -11,6 +13,8 @@ import { AuthService } from '../../core/services/auth.service';
 export class ProfileComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private history = inject(HistoryService);
+  private notifications = inject(Notification);
 
   readonly email = computed(() => this.auth.getCurrentUserEmail());
   readonly name = computed(() => {
@@ -32,9 +36,19 @@ export class ProfileComponent {
     return letters.join('') || 'U';
   });
 
+  readonly totalOperations = computed(() => this.history.total());
+
   logout() {
     this.auth.logout();
+    this.notifications.info('Logged out.');
     this.router.navigateByUrl('/login');
+  }
+
+  clearHistory() {
+    const ok = !globalThis.confirm || globalThis.confirm('Clear all saved history for this account?');
+    if (!ok) return;
+    this.history.clear();
+    this.notifications.success('History cleared.');
   }
 }
 

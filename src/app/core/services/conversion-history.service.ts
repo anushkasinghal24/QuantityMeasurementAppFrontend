@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID, computed, effect, signal } from '@angular/core';
 import { AuthService } from './auth.service';
+import { Storage as AppStorage } from './storage';
 import { UnitCategoryId, UnitId } from './unit-converter.service';
 
 export type HistoryEntryBase = {
@@ -34,18 +35,62 @@ export type ConversionHistoryEntry =
 export class ConversionHistoryService {
   private platformId = inject(PLATFORM_ID);
   private auth = inject(AuthService);
+  private storageService = inject(AppStorage);
+
+  private readonly guestKey = 'qma_history_guest';
+  private readonly legacyGuestKey = 'qma_history';
+  private readonly maxItems = 250;
+
+  private lastEmail: string | null = null;
 
   private readonly itemsSignal = signal<ConversionHistoryEntry[]>([]);
 
   readonly items = computed(() => this.itemsSignal());
   readonly total = computed(() => this.itemsSignal().length);
   readonly last = computed(() => this.itemsSignal()[0] ?? null);
+  readonly isGuest = computed(() => !this.auth.currentUserEmail());
 
   constructor() {
     if (this.isBrowser()) {
-      this.itemsSignal.set(this.load());
+      this.itemsSignal.set(this.loadKey(this.activeKey()));
+
+      effect(
+        () => {
+          const email = this.auth.currentUserEmail();
+          if (email === this.lastEmail) return;
+          this.lastEmail = email;
+
+          if (!email) {
+            const mergedGuest = mergeAndSort(this.loadKey(this.guestKey), this.loadKey(this.legacyGuestKey)).slice(
+              0,
+              this.maxItems,
+            );
+            if (mergedGuest.length > 0) this.saveKey(this.guestKey, mergedGuest);
+            this.storageService.removeItem(this.legacyGuestKey);
+            this.itemsSignal.set(mergedGuest);
+            return;
+          }
+
+          const userKey = this.userKey(email);
+          const userItems = this.loadKey(userKey);
+          const guestItems = mergeAndSort(this.loadKey(this.guestKey), this.loadKey(this.legacyGuestKey));
+
+          if (guestItems.length > 0) {
+            const merged = mergeAndSort(userItems, guestItems).slice(0, this.maxItems);
+            this.saveKey(userKey, merged);
+            this.storageService.removeItem(this.guestKey);
+            this.storageService.removeItem(this.legacyGuestKey);
+            this.itemsSignal.set(merged);
+            return;
+          }
+
+          this.itemsSignal.set(userItems);
+        },
+        { allowSignalWrites: true },
+      );
+
       effect(() => {
-        this.save(this.itemsSignal());
+        this.saveKey(this.activeKey(), this.itemsSignal());
       });
     }
   }
@@ -73,43 +118,41 @@ export class ConversionHistoryService {
   private add(entry: Omit<ConversionHistoryEntry, 'id' | 'createdAt'> & { kind: ConversionHistoryEntry['kind'] }) {
     const id = globalThis.crypto?.randomUUID?.() ?? `h_${Date.now()}_${Math.random().toString(16).slice(2)}`;
     const createdAt = new Date().toISOString();
-    this.itemsSignal.update(items => [{ ...entry, id, createdAt } as ConversionHistoryEntry, ...items].slice(0, 250));
+    this.itemsSignal.update(items =>
+      [{ ...entry, id, createdAt } as ConversionHistoryEntry, ...items].slice(0, this.maxItems),
+    );
   }
 
-  private load(): ConversionHistoryEntry[] {
-    const raw = this.storage()?.getItem(this.storageKey());
-    if (!raw) return [];
-    const parsed = safeJsonParse(raw);
+  private activeKey(): string {
+    const email = this.auth.currentUserEmail();
+    if (email) return this.userKey(email);
+    return this.guestKey;
+  }
+
+  private userKey(email: string): string {
+    return `qma_history_${email}`;
+  }
+
+  private loadKey(key: string): ConversionHistoryEntry[] {
+    const parsed = this.storageService.getJson<unknown[]>(key);
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isHistoryEntry);
   }
 
-  private save(items: ConversionHistoryEntry[]) {
-    this.storage()?.setItem(this.storageKey(), JSON.stringify(items));
-  }
-
-  private storageKey(): string {
-    const email = this.auth.getCurrentUserEmail();
-    if (email) return `qma_history_${email}`;
-    return 'qma_history';
+  private saveKey(key: string, items: ConversionHistoryEntry[]) {
+    this.storageService.setJson(key, items);
   }
 
   private isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
   }
-
-  private storage(): Storage | null {
-    if (!this.isBrowser()) return null;
-    return globalThis.localStorage ?? null;
-  }
 }
 
-function safeJsonParse(input: string): unknown {
-  try {
-    return JSON.parse(input) as unknown;
-  } catch {
-    return null;
-  }
+function mergeAndSort(a: ConversionHistoryEntry[], b: ConversionHistoryEntry[]): ConversionHistoryEntry[] {
+  const byId = new Map<string, ConversionHistoryEntry>();
+  for (const item of a) byId.set(item.id, item);
+  for (const item of b) byId.set(item.id, item);
+  return [...byId.values()].sort((x, y) => (x.createdAt < y.createdAt ? 1 : x.createdAt > y.createdAt ? -1 : 0));
 }
 
 function isHistoryEntry(value: unknown): value is ConversionHistoryEntry {

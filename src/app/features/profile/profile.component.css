@@ -24,6 +24,9 @@
 
 .panel-actions {
   margin-top: 6px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .profile-row {
@@ -33,7 +36,7 @@
   padding: 12px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-2);
 }
 
 .avatar {

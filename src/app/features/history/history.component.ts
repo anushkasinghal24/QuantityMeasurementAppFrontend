@@ -1,6 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
-import { ConversionHistoryEntry, ConversionHistoryService } from '../../core/services/conversion-history.service';
-import { UnitConverterService } from '../../core/services/unit-converter.service';
+import { ConversionHistoryEntry } from '../../core/services/conversion-history.service';
+import { HistoryService } from '../../core/services/history.service';
+import { Notification } from '../../core/services/notification';
+import { ConverterService } from '../../core/services/converter.service';
 
 @Component({
   selector: 'app-history',
@@ -9,14 +11,18 @@ import { UnitConverterService } from '../../core/services/unit-converter.service
   styleUrls: ['./history.component.css'],
 })
 export class HistoryComponent {
-  private history = inject(ConversionHistoryService);
-  private units = inject(UnitConverterService);
+  private history = inject(HistoryService);
+  private converter = inject(ConverterService);
+  private notifications = inject(Notification);
 
   readonly entries = computed(() => this.history.items());
   readonly total = computed(() => this.history.total());
 
   clear() {
+    const ok = !globalThis.confirm || globalThis.confirm('Clear all saved history?');
+    if (!ok) return;
     this.history.clear();
+    this.notifications.success('History cleared.');
   }
 
   format(entry: ConversionHistoryEntry): string {
@@ -30,8 +36,14 @@ export class HistoryComponent {
   }
 
   formatCategory(entry: ConversionHistoryEntry): string {
-    const found = this.units.categories.find(c => c.id === entry.category);
+    const found = this.converter.categories.find(c => c.id === entry.category);
     return found?.label ?? entry.category;
+  }
+
+  formatKind(entry: ConversionHistoryEntry): string {
+    if (entry.kind === 'convert') return 'conversion';
+    if (entry.kind === 'compare') return 'comparison';
+    return 'arithmetic';
   }
 
   formatDate(iso: string): string {

@@ -20,21 +20,14 @@
   </header>
 
   <div class="grid grid-3">
-    <div class="card stat">
-      <div class="stat-label">Total conversions</div>
-      <div class="stat-value">{{ totalConversions() }}</div>
-    </div>
-    <div class="card stat">
-      <div class="stat-label">Categories used</div>
-      <div class="stat-value">{{ categoriesUsed() }}</div>
-    </div>
-    <div class="card stat">
-      <div class="stat-label">Last conversion</div>
-      <div class="stat-value stat-small">{{ lastSummary() }}</div>
-      @if (last()) {
-        <div class="stat-meta">{{ formatCategory(last()) }}</div>
-      }
-    </div>
+    <app-stat-card label="Total operations performed" [value]="totalOperations()"></app-stat-card>
+    <app-stat-card label="Most used category" [value]="mostUsedCategoryLabel()" valueSize="small"></app-stat-card>
+    <app-stat-card
+      label="Last operation"
+      [value]="lastSummary()"
+      valueSize="small"
+      [meta]="last() ? formatCategory(last()) : null"
+    ></app-stat-card>
   </div>
 
   <div class="grid grid-2">
@@ -50,8 +43,8 @@
     <div class="card panel">
       <h2 class="panel-title">Tips</h2>
       <ul class="tips">
-        <li>Use <strong>Compare</strong> for “1km &gt; 500m” style checks.</li>
-        <li>Use <strong>Calculate</strong> for “5m + 10cm” and “10kg / 2”.</li>
+        <li>Use <strong>Compare</strong> for "1km &gt; 500m" style checks.</li>
+        <li>Use <strong>Calculate</strong> for "5m + 10cm" and "10kg / 2".</li>
         <li>Save results to build your personal history.</li>
       </ul>
     </div>

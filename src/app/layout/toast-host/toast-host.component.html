@@ -1,0 +1,19 @@
+<div class="toast-host" aria-live="polite" aria-relevant="additions removals">
+  @for (item of notifications.items(); track item.id) {
+    <div
+      class="toast"
+      [class.success]="item.kind === 'success'"
+      [class.info]="item.kind === 'info'"
+      [class.warning]="item.kind === 'warning'"
+      [class.error]="item.kind === 'error'"
+    >
+      <div class="toast-body">
+        <div class="toast-kind">{{ item.kind }}</div>
+        <div class="toast-msg">{{ item.message }}</div>
+      </div>
+
+      <button class="toast-close" type="button" (click)="dismiss(item.id)" aria-label="Dismiss notification">×</button>
+    </div>
+  }
+</div>
+

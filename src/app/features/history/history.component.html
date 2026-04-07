@@ -31,7 +31,7 @@
             @for (entry of entries(); track entry.id) {
               <tr>
                 <td>{{ formatDate(entry.createdAt) }}</td>
-                <td class="type">{{ entry.kind }}</td>
+                <td class="type">{{ formatKind(entry) }}</td>
                 <td>{{ formatCategory(entry) }}</td>
                 <td class="details">{{ format(entry) }}</td>
               </tr>

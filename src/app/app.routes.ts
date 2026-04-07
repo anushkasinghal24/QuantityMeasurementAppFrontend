@@ -3,8 +3,15 @@ import { authGuard } from './core/guards/auth-guard';
 import { publicOnlyGuard } from './core/guards/public-only.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  
+  { path: '', redirectTo: 'app/dashboard', pathMatch: 'full' },
+
+  // Guest mode: converter is available without authentication.
+  {
+    path: 'converter',
+    loadComponent: () =>
+      import('./features/converter/converter.component').then(m => m.ConverterComponent),
+  },
+
   {
     path: 'login',
     canActivate: [publicOnlyGuard],
@@ -20,7 +27,6 @@ export const routes: Routes = [
 
   {
     path: 'app',
-    canActivate: [authGuard],
     loadComponent: () =>
       import('./layout/shell/shell.component').then(m => m.ShellComponent),
     children: [
@@ -36,11 +42,13 @@ export const routes: Routes = [
       },
       {
         path: 'history',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/history/history.component').then(m => m.HistoryComponent),
       },
       {
         path: 'profile',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/profile/profile.component').then(m => m.ProfileComponent),
       },
@@ -48,5 +56,5 @@ export const routes: Routes = [
     ],
   },
 
-  { path: '**', redirectTo: 'login' },
+  { path: '**', redirectTo: 'app/dashboard' },
 ];

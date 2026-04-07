@@ -2,7 +2,7 @@
   <header class="page-header">
     <div>
       <h1 class="page-title">Profile</h1>
-      <p class="page-subtitle">Dummy profile details for the demo app.</p>
+      <p class="page-subtitle">Account details and preferences.</p>
     </div>
   </header>
 
@@ -23,9 +23,14 @@
         <div class="v">{{ name() }}</div>
         <div class="k">Email</div>
         <div class="v">{{ email() || '—' }}</div>
+        <div class="k">Operations</div>
+        <div class="v">{{ totalOperations() }}</div>
       </div>
 
       <div class="panel-actions">
+        <button class="btn btn-secondary" type="button" (click)="clearHistory()" [disabled]="totalOperations() === 0">
+          Clear history
+        </button>
         <button class="btn btn-secondary" type="button" (click)="logout()">Logout</button>
       </div>
     </div>
@@ -33,7 +38,8 @@
     <div class="card panel">
       <h2 class="panel-title">About</h2>
       <p class="panel-text">
-        This is a dummy profile page for the Quantity Measurement App. Preferences and account settings can be added later.
+        This demo app stores your session, history, and theme preference locally in your browser. Add a backend later to sync
+        across devices.
       </p>
       <button class="btn btn-secondary" type="button" disabled>Edit profile (coming soon)</button>
     </div>
