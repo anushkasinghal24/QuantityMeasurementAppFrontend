@@ -43,6 +43,16 @@
 
       <button class="btn btn-primary w-full" type="submit">Sign in</button>
 
+      @if (isBrowser) {
+        <div class="auth-divider">or</div>
+        <div class="field google-signin" (click)="beginGoogleSignIn()">
+          <asl-google-signin-button [width]="400" type="standard" size="large" text="signin_with"></asl-google-signin-button>
+        </div>
+        @if (googleAuth.status() === 'pending') {
+          <p class="auth-hint">Waiting for Google sign-in… (check popup blockers)</p>
+        }
+      }
+
       <p class="auth-footer">
         New here?
         <a class="link" routerLink="/signup">Create an account</a>

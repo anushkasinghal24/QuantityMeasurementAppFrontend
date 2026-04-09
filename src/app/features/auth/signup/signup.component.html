@@ -66,6 +66,16 @@
         <a class="link" routerLink="/login">Sign in</a>
       </p>
 
+      @if (isBrowser) {
+        <div class="auth-divider">or</div>
+        <div class="field google-signin" (click)="beginGoogleSignUp()">
+          <asl-google-signin-button [width]="400" type="standard" size="large" text="signup_with"></asl-google-signin-button>
+        </div>
+        @if (googleAuth.status() === 'pending') {
+          <p class="auth-hint">Waiting for Google sign-in… (check popup blockers)</p>
+        }
+      }
+
       <p class="auth-footer">
         Or
         <a class="link" routerLink="/converter">continue as guest</a>.

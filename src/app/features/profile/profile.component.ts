@@ -16,8 +16,13 @@ export class ProfileComponent {
   private history = inject(HistoryService);
   private notifications = inject(Notification);
 
+  private readonly session = computed(() => this.auth.session());
+
   readonly email = computed(() => this.auth.getCurrentUserEmail());
   readonly name = computed(() => {
+    const sessionName = this.session()?.name ?? null;
+    if (sessionName) return sessionName;
+
     const email = this.email();
     if (!email) return 'Guest User';
     const base = email.split('@')[0] ?? '';
