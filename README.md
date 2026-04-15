@@ -1,188 +1,145 @@
-# Quantity Measurement App — Frontend
+# Quantity Measurement App - Frontend
+A sleek, modern, and highly interactive Angular frontend for unit conversions, quantity arithmetic, and operation tracking, built with performance and user experience at its core.
 
-> A responsive unit conversion dashboard (compare, convert, arithmetic) built with **HTML/CSS/JavaScript** and **Bootstrap 5**, including a lightweight **login/signup demo** backed by `localStorage`.
+## Overview
+The Quantity Measurement App frontend is a responsive web application designed to simplify complex unit calculations through an intuitive Angular-based interface.
 
-## Table of Contents
+It enables users to:
 
-- [Project Title](#project-title)
-- [Project Description](#project-description)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Branches](#branches)
-- [Project Structure](#project-structure)
-- [Installation & Setup Instructions](#installation--setup-instructions)
-- [Usage Instructions](#usage-instructions)
-- [API Endpoints](#api-endpoints)
-- [Screenshots / Demo](#screenshots--demo)
-- [Progress Tracker](#progress-tracker)
-- [Development Timeline](#development-timeline)
-- [Challenges Faced](#challenges-faced)
-- [Learnings](#learnings)
-- [Future Enhancements](#future-enhancements)
-- [Contributing Guidelines](#contributing-guidelines)
-- [License](#license)
+- Convert units seamlessly
+- Perform arithmetic operations on quantities
+- Track and analyze past operations
+- Work through a clean, fast, and scalable UI
 
-## Project Title
+## Key Highlights
 
-**Quantity Measurement App — Frontend**
+### Real-Time Unit Conversion
+Effortlessly convert between multiple measurement units with instant results.
 
-## Project Description
+### Smart Quantity Arithmetic
+Perform operations like addition and subtraction with automatic unit normalization.
 
-This project is a **frontend-only** unit measurement utility that lets users **compare units**, **convert values**, and perform **basic arithmetic** on measurements across multiple categories (Length, Weight, Temperature, Volume, Area, Time, Speed).  
-It also includes a simple **authentication demo** (signup/login/logout) using browser storage to simulate user sessions.
+### Interactive Dashboard
+- Live stats overview
+- Recent activity tracking
+- Clean and structured UI components
 
-> Placeholder note: If you plan to connect a real backend (auth + persistence), see [API Endpoints](#api-endpoints) for a suggested contract.
+### History Management System
+- Stores all operations
+- Easy-to-read and organized layout
 
-## Features
+### Authentication Ready
+- Context-based or service-based auth structure
+- Easily extendable to OAuth integrations such as Google Login
 
-- ✨ Convert units across multiple categories (Length, Weight, Temperature, Volume, Area, Time, Speed)
-- 🧮 Compare values and run arithmetic (+, −, ×, ÷) with validation
-- 🔁 Swap conversion units for faster workflows
-- 👤 Signup/Login demo with session persistence (`localStorage` / `sessionStorage`)
-- 🌓 Theme toggle (Light/Dark)
-- 📱 Responsive UI using Bootstrap 5 and Bootstrap Icons
+### Fully Responsive Design
+Optimized for desktop, tablet, and mobile devices.
+
+## UI Preview
+- Modern dashboard layout
+- Minimal yet functional design
+- Smooth navigation and transitions
+- Toast notifications for better UX
 
 ## Tech Stack
 
-| Layer | Technology |
+| Category | Technology |
 | --- | --- |
-| Frontend | HTML5, CSS3, JavaScript (ES6), Bootstrap 5, Bootstrap Icons |
-| Backend | Not implemented (frontend-only demo). _Planned_: Node.js/Express (or any REST backend) |
-| Database | Not implemented. _Current_: `localStorage` / `sessionStorage` for demo. _Planned_: PostgreSQL / MongoDB |
-| Tools | Git, GitHub, VS Code (recommended), Live Server (recommended) |
+| Frontend Framework | Angular |
+| Language | TypeScript |
+| Build Tool | Angular CLI |
+| Styling | CSS / SCSS / Tailwind CSS |
+| Routing | Angular Router |
+| API Handling | Angular HttpClient |
+| State Management | RxJS / Services |
+| Notifications | Toast / Snackbar Integration |
+| Icons | Angular-compatible icon set |
 
-## Branches
+## Architecture & Design
+The project follows a modular and scalable Angular architecture:
 
-The repository currently uses the following branches:
+- Component-based structure
+- Separation of concerns across UI, logic, and API layers
+- Reusable components, services, and utilities
+- Centralized API handling
+- Reactive data flow with RxJS
 
-| Branch | Last Commit (IST) | Commit | Author | Summary | Notes |
-| --- | --- | --- | --- | --- | --- |
-| `main` | 2026-03-25 | `8e5d2d4` | anushkasinghal24 | Added first commit | Baseline/docs (UI not merged yet) |
-| `dev` | 2026-03-25 | `8e5d2d4` | anushkasinghal24 | Added first commit | Currently mirrors `main` |
-| `feature/QMA-HTML-CSS-JS` | 2026-03-28 | `e5c7dbb` | anushkasinghal24 | Added quantity measurement frontend | Active UI implementation |
-
-> Tip: To run the UI locally, checkout `feature/QMA-HTML-CSS-JS` (see setup steps below).
-
-## Project Structure
-
-> Note: The structure below reflects the working UI available in `feature/QMA-HTML-CSS-JS`.
+## Folder Structure
 
 ```text
-QuantityMeasurementAppFrontend/
-├─ frontend/
-│  ├─ index.html        # Dashboard (convert/compare/arithmetic)
-│  ├─ login.html        # Login page (fallback/alternative)
-│  ├─ signup.html       # Signup page (fallback/alternative)
-│  ├─ style.css         # UI styling + theming tokens
-│  ├─ script.js         # App logic (routing, conversion, validation, UI events)
-│  ├─ shared.js         # Theme + storage helpers (auth/session)
-│  └─ favicon.svg       # App icon
-└─ README.md
+src/
+|-- app/
+|   |-- components/      # Reusable UI components
+|   |-- pages/           # Application pages
+|   |-- services/        # API calls and business logic
+|   |-- models/          # Shared interfaces and types
+|   |-- guards/          # Route guards for auth protection
+|   |-- interceptors/    # HTTP interceptors
+|   |-- shared/          # Shared modules, pipes, and utilities
+|   |-- app-routing.module.ts
+|   |-- app.module.ts
+|   `-- app.component.*
+|-- assets/              # Static assets
+|-- environments/        # Environment configuration
+`-- styles.scss          # Global styles
 ```
 
-## Installation & Setup Instructions
+## Setup & Installation
 
-### 1) Clone the repository
-
+### Clone the Repository
 ```bash
-git clone https://github.com/anushkasinghal24/QuantityMeasurementAppFrontend.git
+git clone <your-repo-url>
 cd QuantityMeasurementAppFrontend
 ```
 
-### 2) Checkout the working UI branch
-
+### Install Dependencies
 ```bash
-git checkout feature/QMA-HTML-CSS-JS
+npm install
 ```
 
-### 3) Run locally (recommended: local server)
-
-Option A — VS Code Live Server:
-1. Open the project in VS Code
-2. Open `frontend/index.html`
-3. Click **Go Live**
-
-Option B — Python HTTP server:
-
+### Run Locally
 ```bash
-cd frontend
-python -m http.server 5500
+ng serve
 ```
 
-Then open `http://localhost:5500` in your browser.
+Open the app at:
 
-## Usage Instructions
+```bash
+http://localhost:4200
+```
 
-1. Open the app (see setup above).
-2. Create an account via **Sign up**.
-3. Login using your credentials.
-4. In the dashboard:
-   - Choose a measurement type (e.g., Length, Weight, Temperature).
-   - Choose an action: **Convert**, **Compare**, or **Arithmetic**.
-   - Enter values and select units.
-   - Use **Swap** (where applicable) to quickly invert conversion direction.
-5. Use **Theme** to toggle Light/Dark mode.
+### Production Build
+```bash
+ng build
+```
 
-## API Endpoints
+## API Configuration
+All backend communication is handled through Angular services and `HttpClient`.
 
-This project currently runs without a backend (no network calls).  
-If you integrate an API later, here is a suggested contract:
+### Suggested Location
 
-| Method | Endpoint | Description | Request Body (example) | Response (example) |
-| --- | --- | --- | --- | --- |
-| `POST` | `/api/auth/signup` | Create user account | `{ "name": "Jane", "email": "jane@x.com", "password": "******" }` | `{ "id": "u1", "name": "Jane" }` |
-| `POST` | `/api/auth/login` | Login + return session/JWT | `{ "email": "jane@x.com", "password": "******" }` | `{ "token": "..." }` |
-| `POST` | `/api/auth/logout` | Invalidate session (optional) | `—` | `204 No Content` |
-| `GET` | `/api/profile` | Get current user profile | `—` | `{ "id": "u1", "name": "Jane" }` |
+```text
+src/environments/environment.ts
+```
 
-## Screenshots / Demo
+Update the API base URL according to your backend deployment.
 
-- Screenshots: _Coming soon_ (add images under `docs/screenshots/` and link them here)
-- Demo: _Coming soon_ (GitHub Pages / Netlify / Vercel)
+## Unique Selling Points (USP)
 
-## Progress Tracker
-
-| Date (YYYY-MM-DD) | Day | Task Completed | Description | Status |
-| --- | --- | --- | --- | --- |
-| 2026-03-25 | Wednesday | Repository initialized | Created repo and initial documentation baseline. | ✅ Done |
-| 2026-03-28 | Saturday | Frontend UI implemented | Added HTML/CSS/JS frontend for unit conversion + auth demo on `feature/QMA-HTML-CSS-JS`. | ✅ Done |
-| 2026-03-30 | Monday | README professionalized | Added structured README with setup, branching, and tracking sections. | ✅ Done |
-| 2026-04-01 | Wednesday | API integration (planned) | Replace demo auth with real backend endpoints and persistent storage. | ⏳ Planned |
-
-## Development Timeline
-
-- **2026-03-25** — Project repository created (initial baseline on `main` / `dev`).
-- **2026-03-28** — First working UI milestone delivered on `feature/QMA-HTML-CSS-JS`.
-- **2026-03-30** — Documentation milestone: README expanded with setup, branch tracking, and timeline.
-- **2026-04-01** _(planned)_ — Backend integration and production deployment.
-
-## Challenges Faced
-
-- Designing a clean UX for multiple measurement categories and actions without overwhelming the UI.
-- Handling unit conversion consistently (base units + special cases like temperature).
-- Implementing a safe, minimal auth/session demo without a backend.
-
-## Learnings
-
-- Practical conversion modeling using base-unit normalization.
-- Building responsive layouts quickly with Bootstrap utility classes.
-- Managing user session state using `localStorage` / `sessionStorage`.
+- Handles unit normalization automatically during arithmetic
+- Clean separation between business logic and UI
+- Designed for scalability and microservices integration
+- Smooth UX with real-time feedback and notifications
+- Ready for production deployment
 
 ## Future Enhancements
 
-- 🔐 Replace demo auth with a real backend (JWT + refresh tokens)
-- 🗄️ Persist user profiles and history (conversion logs)
-- 📈 Add analytics (most-used conversions, recent activity)
-- 🌍 Add i18n support and better accessibility (ARIA + keyboard flows)
-- 🚀 Deploy to GitHub Pages / Netlify with CI checks
+- Google OAuth login integration
+- Advanced data visualization
+- More unit categories like temperature and currency
+- PWA support with offline capability
+- Multi-language support
 
-## Contributing Guidelines
+## Author
 
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature/<short-name>`.
-3. Make changes with clear commits.
-4. Open a Pull Request with:
-   - What changed and why
-   - Screenshots (UI changes)
-   - Testing notes (manual steps)
-
+Riddhi Srivastava
