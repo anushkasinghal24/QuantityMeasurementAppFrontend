@@ -1,60 +1,27 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth-guard';
-import { publicOnlyGuard } from './core/guards/public-only.guard';
+import { authGuard, publicOnlyGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'app/dashboard', pathMatch: 'full' },
-
-  // Guest mode: converter is available without authentication.
-  {
-    path: 'converter',
-    loadComponent: () =>
-      import('./features/converter/converter.component').then(m => m.ConverterComponent),
-  },
-
+  { path: '', loadComponent: () => import('./pages/landing/landing.component').then(m => m.LandingComponent) },
+  { path: 'oauth-callback', loadComponent: () => import('./pages/oauth-callback/oauth-callback.component').then(m => m.OAuthCallbackComponent) },
   {
     path: 'login',
-    canActivate: [publicOnlyGuard],
-    loadComponent: () =>
-      import('./features/auth/login/login.component').then(m => m.LoginComponent),
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+    canActivate: [publicOnlyGuard]
   },
   {
-    path: 'signup',
-    canActivate: [publicOnlyGuard],
-    loadComponent: () =>
-      import('./features/auth/signup/signup.component').then(m => m.SignupComponent),
+    path: 'register',
+    loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent),
+    canActivate: [publicOnlyGuard]
   },
-
   {
-    path: 'app',
-    loadComponent: () =>
-      import('./layout/shell/shell.component').then(m => m.ShellComponent),
+    path: '',
+    loadComponent: () => import('./components/layout/app-layout.component').then(m => m.AppLayoutComponent),
     children: [
-      {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
-      },
-      {
-        path: 'converter',
-        loadComponent: () =>
-          import('./features/converter/converter.component').then(m => m.ConverterComponent),
-      },
-      {
-        path: 'history',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./features/history/history.component').then(m => m.HistoryComponent),
-      },
-      {
-        path: 'profile',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./features/profile/profile.component').then(m => m.ProfileComponent),
-      },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-    ],
+      { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'history', loadComponent: () => import('./pages/history/history.component').then(m => m.HistoryComponent), canActivate: [authGuard] },
+      { path: 'profile', loadComponent: () => import('./pages/profile/profile.component').then(m => m.ProfileComponent), canActivate: [authGuard] },
+    ]
   },
-
-  { path: '**', redirectTo: 'app/dashboard' },
+  { path: '**', loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent) },
 ];

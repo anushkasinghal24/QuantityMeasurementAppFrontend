@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  googleOAuthClientId: 'GOOGle CLIENT ID',
-} as const;
-
+  baseUrl: 'http://localhost:8080',
+  authServiceUrl: 'http://localhost:8081'
+};

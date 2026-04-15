@@ -1,14 +1,49 @@
-# QuantityMeasurementAppFrontend
+# QMA Angular — Quantity Measurement App
 
-## Google Sign-In setup (OAuth 2.0)
+Angular 17 conversion of the React QMA frontend.
 
-1. Create a Google OAuth Client ID (Web) in Google Cloud Console.
-2. Add your local dev origin to **Authorized JavaScript origins**:
-   - `http://localhost:4200`
-3. Put the Client ID into:
-   - `src/environments/environment.ts` (`googleOAuthClientId`)
+## Setup & Run
 
-## Run
+```bash
+npm install
+ng serve
+```
 
-- Install deps: `npm.cmd i`
-- Start dev server: `npm.cmd start`
+App runs at **http://localhost:4200**
+
+## Environment Configuration
+
+Edit `src/environments/environment.ts` (dev) or `environment.prod.ts` (prod):
+
+```ts
+export const environment = {
+  production: false,
+  baseUrl: 'http://localhost:8080',        // Spring Boot API Gateway
+  authServiceUrl: 'http://localhost:8081'  // Auth Service (for Google OAuth)
+};
+```
+
+All API calls use `${environment.baseUrl}/api/...`
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── components/
+│   │   ├── layout/          # AppLayout, ToastContainer
+│   │   └── dashboard/       # ConverterWidget, ArithmeticWidget, RecentHistory, StatsCards
+│   ├── guards/              # authGuard, publicOnlyGuard
+│   ├── models/              # TypeScript interfaces + unit definitions
+│   ├── pages/               # Landing, Login, Register, Dashboard, History, Profile, NotFound, OAuthCallback
+│   └── services/            # AuthService, ApiService, ToastService
+└── environments/
+    ├── environment.ts       # Development
+    └── environment.prod.ts  # Production
+```
+
+## Build for Production
+
+```bash
+ng build --configuration production
+```

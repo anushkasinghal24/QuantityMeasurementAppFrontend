@@ -2,11 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "rootDir": "src/app",      // <-- explicitly set to the common source folder
-    "types": ["vitest/globals"]
+    "types": ["jasmine"]
   },
   "include": [
-    "src/**/*.d.ts",
-    "src/**/*.spec.ts"
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
   ]
 }

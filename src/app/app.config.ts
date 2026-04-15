@@ -1,38 +1,24 @@
-import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { environment } from '../environments/environment';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { catchError, throwError } from 'rxjs';
 
-// Google Auth imports
-import {
-  GoogleLoginProvider,
-  SOCIAL_AUTH_CONFIG,
-  SocialAuthServiceConfig,
-  SocialLoginModule,
-} from '@abacritt/angularx-social-login';
+const authInterceptor: HttpInterceptorFn = (req, next) => {
+  return next(req).pipe(
+    catchError(err => {
+      if (err.status === 401) localStorage.removeItem('qma_token');
+      return throwError(() => err);
+    })
+  );
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideClientHydration(withEventReplay()),
-    // Registers SocialAuthService + related providers for standalone apps.
-    importProvidersFrom(SocialLoginModule),
-
-    // 🔥 Google Login Provider
-    {
-      provide: SOCIAL_AUTH_CONFIG,
-      useValue: {
-        autoLogin: false,
-        onError: (err: unknown) => console.error('Google auth error', err),
-        providers: [
-          {
-            id: GoogleLoginProvider.PROVIDER_ID,
-            provider: new GoogleLoginProvider(environment.googleOAuthClientId)
-          }
-        ]
-      } as SocialAuthServiceConfig
-    },
+    provideHttpClient(withInterceptors([authInterceptor])),
+    provideAnimations(),
   ],
 };
