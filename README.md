@@ -142,4 +142,4 @@ Update the API base URL according to your backend deployment.
 
 ## Author
 
-Riddhi Srivastava
+Anushka Singhal
