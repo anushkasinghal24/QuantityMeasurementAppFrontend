@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-oauth-callback',
@@ -42,7 +43,7 @@ export class OAuthCallbackComponent implements OnInit {
     if (token) {
       this.auth.setOAuthSession(token, username, email);
       this.toast.success('Signed in with Google! 🎉');
-      window.location.href = '/dashboard';
+      window.location.href = `${environment.frontendUrl.replace(/\/$/, '')}/dashboard`;
     } else {
       this.toast.error('Google sign-in failed — please try again');
       this.router.navigate(['/login']);
