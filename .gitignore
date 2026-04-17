@@ -1,3 +1,15 @@
-.angular/
+# Node
 node_modules/
+npm-debug.log*
+
+# Build output
 dist/
+out-tsc/
+
+# Angular cache
+.angular/
+
+# IDE
+.idea/
+.vscode/
+*.swp

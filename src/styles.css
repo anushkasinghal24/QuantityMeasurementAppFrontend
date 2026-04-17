@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #f8faff;
+    --bg-secondary: #f1f5fe;
+    --text-primary: #0d0e17;
+    --text-secondary: #4b5563;
+    --border: #e2e8f0;
+    --card-bg: #ffffff;
+    --sidebar-bg: #ffffff;
+    --nav-bg: #ffffffdd;
+  }
+
+  .dark {
+    --bg-primary: #0d0e17;
+    --bg-secondary: #13141f;
+    --text-primary: #f1f5fe;
+    --text-secondary: #94a3b8;
+    --border: #1e1f2e;
+    --card-bg: #13141f;
+    --sidebar-bg: #0d0e17;
+    --nav-bg: #0d0e17dd;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 3px; }
+}
+
+@layer components {
+  .card {
+    @apply bg-white dark:bg-surface-900 rounded-2xl border border-gray-100 dark:border-surface-800 shadow-card dark:shadow-card-dark;
+  }
+
+  .btn-primary {
+    @apply bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-5 rounded-xl
+           transition-all duration-200 flex items-center gap-2 justify-center
+           shadow-glow-sm hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-100 dark:bg-surface-800 hover:bg-brand-50 dark:hover:bg-surface-800
+           text-gray-700 dark:text-gray-300 font-medium py-2.5 px-5 rounded-xl
+           border border-gray-200 dark:border-surface-800 transition-all duration-200
+           flex items-center gap-2 justify-center;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-5 rounded-xl
+           transition-all duration-200 flex items-center gap-2 justify-center;
+  }
+
+  .input-field {
+    @apply w-full bg-surface-50 dark:bg-surface-800 border border-gray-200 dark:border-surface-800
+           rounded-xl px-4 py-3 text-gray-800 dark:text-gray-100 placeholder-gray-400
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-all duration-200;
+  }
+
+  .select-field {
+    @apply w-full bg-surface-50 dark:bg-surface-800 border border-gray-200 dark:border-surface-800
+           rounded-xl px-4 py-3 text-gray-800 dark:text-gray-100
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-all duration-200 cursor-pointer;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400
+           hover:bg-brand-50 dark:hover:bg-surface-800 hover:text-brand-600 dark:hover:text-brand-400
+           transition-all duration-200 font-medium;
+  }
+
+  .sidebar-link-active {
+    @apply bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-500 to-accent-500 bg-clip-text text-transparent;
+  }
+}
+
+/* Animated gradient background for hero */
+.hero-bg {
+  background: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.1) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 80%, rgba(99,102,241,0.08) 0%, transparent 50%);
+}
+
+.dark .hero-bg {
+  background: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.2) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.12) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 80%, rgba(99,102,241,0.1) 0%, transparent 50%);
+}
+
+/* Grid pattern background */
+.grid-bg {
+  background-image: linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f1f5fe 25%, #e2e8f0 50%, #f1f5fe 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(90deg, #1e1f2e 25%, #13141f 50%, #1e1f2e 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes arrowPulse {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(4px); opacity: 0.7; }
+}
+.arrow-pulse { animation: arrowPulse 1.5s ease-in-out infinite; }
+
+@keyframes resultPop {
+  0% { transform: scale(0.9); opacity: 0; }
+  70% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.result-pop { animation: resultPop 0.35s ease forwards; }
+
+.page-enter {
+  animation: slideUp 0.4s ease forwards;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: slideUp 0.3s ease forwards;
+  min-width: 280px;
+  max-width: 400px;
+}
+
+.toast-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.toast-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
