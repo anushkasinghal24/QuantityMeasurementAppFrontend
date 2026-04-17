@@ -17,13 +17,13 @@ import { getUnitLabel } from '../../models/units';
 
   <ng-container *ngIf="!loading">
     <div class="rh-header">
-      <h3 class="rh-title">📋 Recent Conversions</h3>
+      <h3 class="rh-title">📋 Recent Activity</h3>
       <button class="view-all-btn" (click)="router.navigate(['/history'])">View all →</button>
     </div>
 
     <div *ngIf="items.length === 0" class="rh-empty">
       <div class="empty-icon">📭</div>
-      <p>No conversions yet.</p>
+      <p>No history yet.</p>
       <p class="empty-sub">Your history will appear here.</p>
     </div>
 
@@ -31,7 +31,7 @@ import { getUnitLabel } from '../../models/units';
       <div *ngFor="let item of items.slice(0, 5)" class="rh-item">
         <div class="rh-icon">🔄</div>
         <div class="rh-info">
-          <p class="rh-desc">{{item.inputValue}} {{getLabel(item.fromUnit)}} → {{item.result}} {{getLabel(item.toUnit)}}</p>
+          <p class="rh-desc">{{describe(item)}}</p>
           <p class="rh-meta">{{item.measurementType}} · {{formatDate(item.createdAt)}}</p>
         </div>
       </div>
@@ -67,6 +67,12 @@ export class RecentHistoryComponent {
   constructor(public router: Router) {}
 
   getLabel(unit?: string): string { return unit ? getUnitLabel(unit) : ''; }
+  describe(item: HistoryItem): string {
+    if (item.operation === 'COMPARE') {
+      return `Compare ${item.inputValue} ${this.getLabel(item.fromUnit)} vs ${item.value2 ?? '—'} ${this.getLabel(item.toUnit)} = ${item.result}`;
+    }
+    return `${item.inputValue} ${this.getLabel(item.fromUnit)} → ${item.result} ${this.getLabel(item.toUnit)}`;
+  }
   formatDate(d?: string): string {
     if (!d) return '';
     return new Date(d).toLocaleString();

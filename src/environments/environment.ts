@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
   baseUrl: 'http://localhost:8080',
-  authServiceUrl: 'http://localhost:8081'
+  authServiceUrl: 'http://localhost:8082'
 };

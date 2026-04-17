@@ -335,7 +335,7 @@ const ALL_OPS = [...DUAL_OPS, ...SCALAR_OPS];
         <span class="result-unit">{{getResultUnitLabel()}}</span>
       </div>
     </ng-template>
-    <p *ngIf="auth.isAuthenticated && selectedOp!=='compare'" class="result-saved">✓ Saved to history</p>
+    <p *ngIf="auth.isAuthenticated" class="result-saved">✓ Saved to history</p>
   </div>
 </div>
   `,
@@ -436,19 +436,20 @@ export class ArithmeticWidgetComponent {
       }
       this.result = data;
 
-      if (this.auth.isAuthenticated && this.auth.user && this.selectedOp !== 'compare') {
+      if (this.auth.isAuthenticated && this.auth.user) {
         const cat = UNIT_CATEGORIES.find(c => c.id === this.selectedCat);
-        firstValueFrom(this.api.saveHistory({
+        await firstValueFrom(this.api.saveHistory({
           username: this.auth.user.username,
           operation: this.selectedOp.toUpperCase(),
           fromUnit: this.unit1,
           toUnit: this.isDualOp ? this.unit2 : 'SCALAR',
           inputValue: v1,
+          value2: this.isDualOp ? v2 : sc,
           result: String(data.result),
           measurementType: cat?.label?.toUpperCase() || 'UNKNOWN',
         })).catch(() => {});
-        this.operationDone.emit();
       }
+      this.operationDone.emit();
     } catch (err: any) {
       this.toast.error(err?.error?.error || 'Operation failed');
     } finally {

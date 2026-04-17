@@ -19,8 +19,8 @@ const CAT_COLORS: Record<string, string> = {
 <div class="history-page">
   <div class="history-header animate-fade-in">
     <div>
-      <h1 class="page-title">Conversion History</h1>
-      <p class="page-sub">All your past conversions &amp; operations</p>
+      <h1 class="page-title">History</h1>
+      <p class="page-sub">All your past conversions, arithmetic operations, and comparisons</p>
     </div>
     <div class="header-actions">
       <button class="view-btn" [ngClass]="{'active': view==='table'}" (click)="view='table'">📋 Table</button>
@@ -33,7 +33,7 @@ const CAT_COLORS: Record<string, string> = {
 
   <!-- Filters -->
   <div class="filters animate-fade-in">
-    <input type="text" class="input-field search-inp" placeholder="🔍 Search conversions…" [(ngModel)]="search">
+    <input type="text" class="input-field search-inp" placeholder="🔍 Search history…" [(ngModel)]="search">
     <div class="filter-cats">
       <button class="filter-btn" [ngClass]="{'active': filterCat==='ALL'}" (click)="filterCat='ALL'">All</button>
       <button *ngFor="let cat of categories" class="filter-btn" [ngClass]="{'active': filterCat===cat.label.toUpperCase()}"
@@ -61,8 +61,8 @@ const CAT_COLORS: Record<string, string> = {
         </div>
         <div *ngFor="let item of filtered" class="table-row">
           <span class="op-badge">{{item.operation || 'CONVERT'}}</span>
-          <span class="mono-cell">{{item.inputValue}} {{getLabel(item.fromUnit)}}</span>
-          <span class="cell-muted">{{getLabel(item.toUnit)}}</span>
+          <span class="mono-cell">{{formatFrom(item)}}</span>
+          <span class="cell-muted">{{formatTo(item)}}</span>
           <span class="result-cell mono-cell">{{item.result}}</span>
           <span class="cat-dot" [style.color]="catColor(item.measurementType)">● {{item.measurementType}}</span>
           <span class="date-cell">{{formatDate(item.createdAt)}}</span>
@@ -182,13 +182,26 @@ export class HistoryComponent implements OnInit {
       const matchCat = this.filterCat === 'ALL' || item.measurementType === this.filterCat;
       const q = this.search.toLowerCase();
       const matchSearch = !q
+        || (item.operation || '').toLowerCase().includes(q)
         || (item.fromUnit || '').toLowerCase().includes(q)
         || (item.toUnit || '').toLowerCase().includes(q)
         || String(item.inputValue).includes(q)
+        || String(item.value2 ?? '').includes(q)
         || String(item.result).includes(q)
         || (item.measurementType || '').toLowerCase().includes(q);
       return matchCat && matchSearch;
     });
+  }
+
+  formatFrom(item: HistoryItem): string {
+    return `${item.inputValue} ${this.getLabel(item.fromUnit)}`;
+  }
+
+  formatTo(item: HistoryItem): string {
+    if (item.operation === 'COMPARE') {
+      return `${item.value2 ?? '—'} ${this.getLabel(item.toUnit)}`;
+    }
+    return this.getLabel(item.toUnit);
   }
 
   get barData(): { day: string; count: number }[] {
@@ -228,9 +241,9 @@ export class HistoryComponent implements OnInit {
 
   exportCsv() {
     if (this.history.length === 0) { this.toast.error('No history to export'); return; }
-    const header = 'Operation,From Value,From Unit,To Unit,Result,Category,Date';
+    const header = 'Operation,From Value,From Unit,To Value,To Unit,Result,Category,Date';
     const rows = this.history.map(h =>
-      [h.operation, h.inputValue, h.fromUnit, h.toUnit, h.result, h.measurementType, h.createdAt].join(',')
+      [h.operation, h.inputValue, h.fromUnit, h.value2 ?? '', h.toUnit, h.result, h.measurementType, h.createdAt].join(',')
     );
     const csv = [header, ...rows].join('\n');
     const a = document.createElement('a');

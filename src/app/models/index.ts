@@ -24,6 +24,7 @@ export interface HistoryItem {
   fromUnit?: string;
   toUnit?: string;
   inputValue?: number;
+  value2?: number;
   result?: string | number;
   measurementType?: string;
   createdAt?: string;
