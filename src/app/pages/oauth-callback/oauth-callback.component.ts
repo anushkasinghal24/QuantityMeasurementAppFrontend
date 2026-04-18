@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-oauth-callback',
@@ -13,7 +12,7 @@ import { environment } from '../../../environments/environment';
         <div class="cb-icon animate-pulse-slow">⚡</div>
         <div class="cb-status">
           <span class="animate-spin">⟳</span>
-          Completing Google sign-in…
+          Completing Google sign-in...
         </div>
       </div>
     </div>
@@ -36,16 +35,16 @@ export class OAuthCallbackComponent implements OnInit {
 
   ngOnInit() {
     const params = this.route.snapshot.queryParamMap;
-    const token    = params.get('token');
+    const token = params.get('token');
     const username = params.get('username') || undefined;
-    const email    = params.get('email') || undefined;
+    const email = params.get('email') || undefined;
 
     if (token) {
       this.auth.setOAuthSession(token, username, email);
-      this.toast.success('Signed in with Google! 🎉');
-      window.location.href = `${environment.frontendUrl.replace(/\/$/, '')}/dashboard`;
+      this.toast.success('Signed in with Google!');
+      this.router.navigate(['/dashboard'], { replaceUrl: true });
     } else {
-      this.toast.error('Google sign-in failed — please try again');
+      this.toast.error('Google sign-in failed. Please try again.');
       this.router.navigate(['/login']);
     }
   }

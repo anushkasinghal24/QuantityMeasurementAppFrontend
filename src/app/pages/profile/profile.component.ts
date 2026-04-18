@@ -155,6 +155,11 @@ export class ProfileComponent implements OnInit {
   ngOnInit() { this.loadStats(); }
 
   async loadStats() {
+    if (!this.auth.isAuthenticated) {
+      this.loading = false;
+      this.stats = { total: 0, today: 0, topCat: '—', categories: {} };
+      return;
+    }
     try {
       const history: HistoryItem[] = await firstValueFrom(this.api.getMyHistory());
       const arr = Array.isArray(history) ? history : [];

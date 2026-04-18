@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { User } from '../models/index';
+import { TokenStorageService } from './token-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
-  private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('qma_token'));
+  private tokenSubject = new BehaviorSubject<string | null>(null);
   private loadingSubject = new BehaviorSubject<boolean>(true);
   private darkModeSubject = new BehaviorSubject<boolean>(localStorage.getItem('qma_dark') === 'true');
 
@@ -15,13 +17,27 @@ export class AuthService {
   loading$ = this.loadingSubject.asObservable();
   darkMode$ = this.darkModeSubject.asObservable();
 
-  constructor(private api: ApiService) {
+  constructor(
+    private api: ApiService,
+    private tokens: TokenStorageService,
+    private router: Router
+  ) {
     this.applyDarkMode(this.darkModeSubject.value);
-    this.fetchProfile(this.tokenSubject.value);
+    const state = this.tokens.getTokenState();
+    this.tokenSubject.next(state.token);
+
+    if (state.expired) {
+      this.router.navigate(['/login']);
+      this.loadingSubject.next(false);
+      return;
+    }
+
+    this.fetchProfile(state.token);
   }
 
   get isAuthenticated(): boolean {
-    return !!this.tokenSubject.value && !!this.userSubject.value;
+    const token = this.tokenSubject.value;
+    return !!token && !this.tokens.isExpired(token) && !!this.userSubject.value;
   }
 
   get user(): User | null { return this.userSubject.value; }
@@ -52,11 +68,12 @@ export class AuthService {
         email:    data.email    || cachedEmail,
       });
     } catch {
-      localStorage.removeItem('qma_token');
+      this.tokens.clearToken();
       localStorage.removeItem('qma_username');
       localStorage.removeItem('qma_email');
       this.tokenSubject.next(null);
       this.userSubject.next(null);
+      this.router.navigate(['/login']);
     } finally {
       this.loadingSubject.next(false);
     }
@@ -65,7 +82,7 @@ export class AuthService {
   async login(username: string, password: string) {
     const data = await firstValueFrom(this.api.login(username, password));
     const tok = data.token;
-    localStorage.setItem('qma_token', tok);
+    this.tokens.setToken(tok);
     localStorage.removeItem('qma_username');
     localStorage.removeItem('qma_email');
     this.tokenSubject.next(tok);
@@ -83,7 +100,7 @@ export class AuthService {
   async register(username: string, password: string, email?: string) {
     const data = await firstValueFrom(this.api.register(username, password, email));
     const tok = data.token;
-    localStorage.setItem('qma_token', tok);
+    this.tokens.setToken(tok);
     this.tokenSubject.next(tok);
     this.userSubject.next({
       username: data.username || username,
@@ -101,7 +118,7 @@ export class AuthService {
     if (tok) {
       try { await firstValueFrom(this.api.logout(tok)); } catch { /* ignore */ }
     }
-    localStorage.removeItem('qma_token');
+    this.tokens.clearToken();
     localStorage.removeItem('qma_username');
     localStorage.removeItem('qma_email');
     this.tokenSubject.next(null);
@@ -109,9 +126,15 @@ export class AuthService {
   }
 
   setOAuthSession(token: string, username?: string, email?: string) {
-    localStorage.setItem('qma_token', token);
+    this.tokens.setToken(token);
     if (username) localStorage.setItem('qma_username', username);
     if (email)    localStorage.setItem('qma_email', email);
     this.tokenSubject.next(token);
+    this.userSubject.next({
+      username: username || localStorage.getItem('qma_username') || '',
+      email: email || localStorage.getItem('qma_email') || '',
+      role: 'USER',
+      provider: 'google',
+    });
   }
 }

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
+import { AuthService } from '../../services/auth.service';
 import { HistoryItem } from '../../models/index';
 import { getUnitLabel, UNIT_CATEGORIES } from '../../models/units';
 
@@ -164,16 +166,33 @@ export class HistoryComponent implements OnInit {
   view: 'table' | 'chart' = 'table';
   categories = UNIT_CATEGORIES;
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  constructor(
+    private api: ApiService,
+    private toast: ToastService,
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() { this.fetchHistory(); }
 
   async fetchHistory() {
+    if (!this.auth.isAuthenticated) {
+      this.loading = false;
+      this.history = [];
+      return;
+    }
     this.loading = true;
     try {
       const data = await firstValueFrom(this.api.getMyHistory());
       this.history = Array.isArray(data) ? data : [];
-    } catch { this.toast.error('Failed to load history'); }
+    } catch (err: any) {
+      if (err?.message === 'AUTH_REQUIRED') {
+        this.history = [];
+        this.router.navigate(['/login']);
+        return;
+      }
+      this.toast.error('Failed to load history');
+    }
     finally { this.loading = false; }
   }
 
@@ -229,6 +248,10 @@ export class HistoryComponent implements OnInit {
   formatDate(d?: string): string { return d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''; }
 
   async handleClear() {
+    if (!this.auth.isAuthenticated) {
+      this.router.navigate(['/login']);
+      return;
+    }
     if (!confirm('Delete ALL your conversion history? This cannot be undone.')) return;
     this.clearing = true;
     try {

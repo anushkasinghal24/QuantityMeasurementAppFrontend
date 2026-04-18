@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { AuthResponse, HistoryItem } from '../models/index';
+import { TokenStorageService } from './token-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -10,13 +12,24 @@ export class ApiService {
   private historyBaseUrl = `${environment.historyServiceUrl.replace(/\/$/, '')}/api`;
   private quantityBaseUrl = `${environment.quantityServiceUrl.replace(/\/$/, '')}/api`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private tokens: TokenStorageService,
+    private router: Router
+  ) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('qma_token');
+  private getHeaders(authRequired = false): HttpHeaders | null {
+    const state = this.tokens.getTokenState();
 
-    if (!token) {
-      console.warn('Token not available, sending request without auth');
+    if (state.expired) {
+      this.router.navigate(['/login']);
+      return null;
+    }
+
+    if (!state.token) {
+      if (authRequired) {
+        return null;
+      }
       return new HttpHeaders({
         'Content-Type': 'application/json',
       });
@@ -24,8 +37,12 @@ export class ApiService {
 
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${state.token}`,
     });
+  }
+
+  private authRequiredError() {
+    return throwError(() => new Error('AUTH_REQUIRED'));
   }
 
   login(username: string, password: string): Observable<AuthResponse> {
@@ -43,62 +60,82 @@ export class ApiService {
   }
 
   getProfile(): Observable<any> {
+    const headers = this.getHeaders(true);
+    if (!headers) return this.authRequiredError();
     return this.http.get<any>(`${this.authBaseUrl}/auth/profile`, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   convert(payload: { value: number; fromUnit: string; toUnit: string }): Observable<any> {
+    const headers = this.getHeaders();
+    if (!headers) return this.authRequiredError();
     return this.http.post<any>(`${this.quantityBaseUrl}/quantity/convert`, payload, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   add(payload: any): Observable<any> {
+    const headers = this.getHeaders();
+    if (!headers) return this.authRequiredError();
     return this.http.post<any>(`${this.quantityBaseUrl}/quantity/arithmetic/add`, payload, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   subtract(payload: any): Observable<any> {
+    const headers = this.getHeaders();
+    if (!headers) return this.authRequiredError();
     return this.http.post<any>(`${this.quantityBaseUrl}/quantity/arithmetic/subtract`, payload, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   multiply(payload: any): Observable<any> {
+    const headers = this.getHeaders();
+    if (!headers) return this.authRequiredError();
     return this.http.post<any>(`${this.quantityBaseUrl}/quantity/arithmetic/multiply`, payload, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   divide(payload: any): Observable<any> {
+    const headers = this.getHeaders();
+    if (!headers) return this.authRequiredError();
     return this.http.post<any>(`${this.quantityBaseUrl}/quantity/arithmetic/divide`, payload, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   compare(payload: any): Observable<any> {
+    const headers = this.getHeaders();
+    if (!headers) return this.authRequiredError();
     return this.http.post<any>(`${this.quantityBaseUrl}/quantity/arithmetic/compare`, payload, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   saveHistory(data: Partial<HistoryItem>): Observable<any> {
+    const headers = this.getHeaders(true);
+    if (!headers) return this.authRequiredError();
     return this.http.post<any>(`${this.historyBaseUrl}/history/save`, data, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   getMyHistory(): Observable<HistoryItem[]> {
+    const headers = this.getHeaders(true);
+    if (!headers) return this.authRequiredError();
     return this.http.get<HistoryItem[]>(`${this.historyBaseUrl}/history/my`, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 
   clearHistory(): Observable<any> {
+    const headers = this.getHeaders(true);
+    if (!headers) return this.authRequiredError();
     return this.http.delete<any>(`${this.historyBaseUrl}/history/clear`, {
-      headers: this.getHeaders(),
+      headers,
     });
   }
 }
